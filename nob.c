@@ -19,10 +19,19 @@ int main(int argc, char **argv) {
 
   nob_cc(cmd);
   nob_cc_flags(cmd);
-  nob_cc_inputs(cmd, SRC_FOLDER "main.c");
-  nob_cc_output(cmd, RUNNABLE);
-	cmd_append(cmd, "-lraylib");
-	cmd_append(cmd, "-lm");
+
+  if (argc > 1) {
+
+    nob_cc_inputs(cmd, SRC_FOLDER "ses.c");
+    nob_cc_output(cmd, BUILD_FOLDER "ses");
+  } else {
+
+    nob_cc_inputs(cmd, SRC_FOLDER "main.c");
+    nob_cc_output(cmd, RUNNABLE);
+  }
+  // nob_cc_output(cmd, RUNNABLE);
+  cmd_append(cmd, "-lraylib");
+  cmd_append(cmd, "-lm");
   if (!cmd_run(cmd))
     return 1;
   return test();
