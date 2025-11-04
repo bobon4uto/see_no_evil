@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 // TRY WALL should be aesier
-#define OBSTACLES_NUM 10000
+#define OBSTACLES_NUM (32 * 32)
 #include "obstacle.h"
 #include "stage.h"
 #define STAGE_WALL_HEIGHT 5
@@ -37,8 +37,8 @@ void init_stage(Stage *stage) {
     }
 
     Obstacle *obstacle = &(stage->obstacles[i]);
-    obstacle->position = (Vector3){((i / 2) % 100) * STAGE_WALL_LENGHT, 0,
-                                   ((i / 2) / 100) * STAGE_WALL_LENGHT};
+    obstacle->position = (Vector3){((i / 2) % 32) * STAGE_WALL_LENGHT, 0,
+                                   ((i / 2) / 32) * STAGE_WALL_LENGHT};
     if (i % 2 == 0) {
       // even
       obstacle->size = Vec3Add(obstacle->position,
@@ -176,13 +176,12 @@ int main(int argc, char **argv) {
   float ghost_distance = 100;
   bool died = false;
   bool won = false;
-  Vector2 mouse = {0, 0};
   Rectangle retryButton = {80, 300, 500, 100};
   InitPlayerAndGhost(&camera, &bill);
 
   float ghosttimer = 0.0f;
 
-  Vector3 finish = {130, 2, 130};
+  Vector3 finish = {145, 2, 30};
   // Sound sound = LoadSound("assets/beat.mp3");
   PlayMusicStream(music);
 
@@ -208,7 +207,7 @@ int main(int argc, char **argv) {
                         GetMouseDelta().y * 0.05f, // Rotation: pitch
                         0.0f                       // Rotation: roll
                     },
-                    GetMouseWheelMove() * 2.0f); // Move to target (zoom)
+                    0.0f); // Move to target (zoom)
 
     bill = Vec3Approach(bill, camera.position, 0.01);
     ghost_distance = Vec3Len(Vec3Sub(bill, camera.position));
@@ -246,14 +245,14 @@ int main(int argc, char **argv) {
       virtualMouse = Vector2Clamp(
           virtualMouse, (Vector2){0, 0},
           (Vector2){(float)gameScreenWidth, (float)gameScreenHeight});
-      if (isInsideRec(virtualMouse, retryButton)) {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-          died = false;
-          won = false;
-          DisableCursor(); // Limit cursor to relative movement inside the
-                           // window
-          InitPlayerAndGhost(&camera, &bill);
-        };
+      if ((isInsideRec(virtualMouse, retryButton) &&
+           IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) ||
+          IsKeyPressed(KEY_ENTER)) {
+        died = false;
+        won = false;
+        DisableCursor(); // Limit cursor to relative movement inside the
+                         // window
+        InitPlayerAndGhost(&camera, &bill);
       }
       BeginTextureMode(target);
       ClearBackground(BLACK);
@@ -296,6 +295,10 @@ int main(int argc, char **argv) {
     DrawTexturePro(arrow_tex, arrow_source, arrow_dst, arrow_orogin,
                    arrow_rotation, DARKGRAY);
     DrawRectangle(0, 0, gameScreenWidth, gameScreenHeight, tintedBlack);
+    // DrawText(TextFormat("%d FPS", GetFPS()), 10, 10, 50, RED);
+    // DrawText(TextFormat("%.2f %.2f", camera.position.x, camera.position.z),
+    // 10,
+    //         10, 50, RED);
     EndTextureMode();
     BeginDrawing();
 

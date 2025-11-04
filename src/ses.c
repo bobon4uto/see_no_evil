@@ -12,16 +12,16 @@ typedef struct {
   bool active;
   bool cute;
 } Wall;
-#define WALLSNUM 10000
+#define WALLSNUM (32 * 32)
 #define WALLEN 10.0
-#define OBSTACLES_NUM 10000
-#include "stage.h"
+#define OBSTACLES_NUM (32 * 32)
+#include "../src/stage.h"
 
 void init_stage_carcas(Wall walls[WALLSNUM]) {
   for (int i = 0; i < WALLSNUM; ++i) {
     Wall *wall = &(walls[i]);
-    wall->shape.x = ((i / 2) % 100) * WALLEN;
-    wall->shape.y = ((i / 2) / 100) * WALLEN;
+    wall->shape.x = ((i / 2) % 32) * WALLEN;
+    wall->shape.y = ((i / 2) / 32) * WALLEN;
     if (i % 2 == 0) {
       // even
       wall->shape.width = WALLEN;
